@@ -11,7 +11,7 @@ export default class Couple implements CoupleInterface {
     this.person2 = null;
     this.children = new Map<String, Person>();
   }
-  findSuns(): String[] {
+  findSons(): String[] {
     const result: String[] = [];
     this.children.forEach((person, name) => {
       if (person.gender == Gender.MALE) result.push(name);

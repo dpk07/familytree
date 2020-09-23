@@ -3,13 +3,19 @@ import { Person, PersonDto } from "../Interfaces";
 export default class InMemoryPersonDto implements PersonDto {
   personMap: Map<String, Person> = new Map<String, Person>();
   addPerson(person: Person) {
-    this.personMap.set(person.name, person);
-    console.log(this.personMap);
+    if (this.personMap.has(person.name.toLocaleLowerCase())) {
+      throw new Error("Person with this name already exists");
+    }
+    this.personMap.set(person.name.toLocaleLowerCase(), person);
   }
   getPerson(name: String): Person {
-    return this.personMap.get(name);
+    return this.personMap.get(name.toLocaleLowerCase());
   }
   getAll(): String[] {
-    return Array.from(this.personMap.keys());
+    let names: String[] = [];
+    Array.from(this.personMap.values()).map((person) => {
+      names.push(person.name);
+    });
+    return names;
   }
 }

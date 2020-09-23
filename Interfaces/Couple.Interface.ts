@@ -8,6 +8,6 @@ export interface Couple {
   copyChildren(couple: Couple);
   setPerson1(person: Person);
   setPerson2(person: Person);
-  findSuns(): String[];
+  findSons(): String[];
   findDaughters(): String[];
 }
