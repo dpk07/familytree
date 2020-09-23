@@ -6,4 +6,8 @@ export interface Couple {
   children: Map<String, Person>;
   addChild(person: Person);
   copyChildren(couple: Couple);
+  setPerson1(person: Person);
+  setPerson2(person: Person);
+  findSuns(): String[];
+  findDaughters(): String[];
 }
