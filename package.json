@@ -1,0 +1,19 @@
+{
+  "name": "familytree",
+  "version": "1.0.0",
+  "description": "Program to manage family tree",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dpk07/familytree.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dpk07/familytree/issues"
+  },
+  "homepage": "https://github.com/dpk07/familytree#readme"
+}
