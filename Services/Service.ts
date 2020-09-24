@@ -4,6 +4,17 @@ import Gender from "../Models/Gender";
 export default class ServiceImpl implements Service {
   personDto: PersonDto;
   coupleDto: CoupleDto;
+  supportedRelationships: Set<String> = new Set<String>([
+    "husband",
+    "wife",
+    "partner",
+    "son",
+    "daughter",
+    "child",
+    "father",
+    "mother",
+    "parent",
+  ]);
   relationships: Set<String> = new Set<String>();
   constructor(personDto: PersonDto, coupleDto: CoupleDto) {
     this.personDto = personDto;
@@ -25,7 +36,12 @@ export default class ServiceImpl implements Service {
     return this.coupleDto.getCouple(name);
   }
   addRelationship(name: String) {
-    this.relationships.add(name.toLowerCase());
+    name = name.toLocaleLowerCase();
+    if (!this.supportedRelationships.has(name)) {
+      throw new Error("This type of relationship is currently not supported.");
+    }
+    this.relationships.add(name);
+    return true;
   }
   setRelationship(fromName: String, toName: String, relationship: String) {
     relationship = relationship.toLocaleLowerCase();

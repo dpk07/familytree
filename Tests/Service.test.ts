@@ -37,6 +37,18 @@ beforeAll(() => {
   service.addPerson(new Person("Hamnet", Gender.MALE));
 });
 
+test("Adding unsupported relationship throws exception", () => {
+  expect(() => service.addRelationship("Uncle")).toThrow(
+    "This type of relationship is currently not supported."
+  );
+});
+
+test("Adding supported relationship gets added successfully", () => {
+  expect(() => {
+    service.addRelationship("child");
+  }).toBeTruthy();
+});
+
 test("Person gets added successfully", () => {
   let p3 = new Person("John Shakespeare", Gender.MALE);
   service.addPerson(p3);
