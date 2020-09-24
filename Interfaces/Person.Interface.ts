@@ -4,4 +4,6 @@ export interface Person {
   parentId: String;
   gender: String;
   setParent(parentId: String);
+  setCouple(coupleId: String);
+  setGender(gender: String);
 }

@@ -8,6 +8,8 @@ export default class InMemoryCoupleDto implements CoupleDto {
     this.coupleMap.set(couple.name, couple);
   }
   getCouple(name: String): Couple {
+    if (!this.coupleMap.has(name))
+      throw new Error("Couple ID Exists, but couple not found");
     return this.coupleMap.get(name);
   }
 }

@@ -4,7 +4,7 @@
   "description": "Program to manage family tree",
   "main": "index.js",
   "scripts": {
-    "start": "tsc && node dist/app.js",
+    "start": "tsc && node dist/index.js",
     "test": "jest"
   },
   "repository": {

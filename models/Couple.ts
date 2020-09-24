@@ -26,9 +26,11 @@ export default class Couple implements CoupleInterface {
     return result;
   }
   setPerson1(person: Person) {
+    if (this.person1) throw new Error("The couple already has two members.");
     this.person1 = person;
   }
   setPerson2(person: Person) {
+    if (this.person2) throw new Error("The couple already has two members.");
     this.person2 = person;
   }
   copyChildren(couple: CoupleInterface) {

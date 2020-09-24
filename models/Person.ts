@@ -12,6 +12,12 @@ export default class Person implements PersonInterface {
     this.coupleId = null;
     this.parentId = null;
   }
+  setCouple(coupleId: String) {
+    this.coupleId = coupleId;
+  }
+  setGender(gender: String) {
+    this.gender = gender;
+  }
   setParent(parentId: String) {
     this.parentId = parentId;
   }

@@ -48,11 +48,12 @@ export default class ServiceImpl implements Service {
         break;
       }
       case "son":
+      case "child":
       case "daughter": {
         if (relationship === "son") {
-          fromPerson.gender = Gender.MALE;
+          fromPerson.setGender(Gender.MALE);
         } else {
-          fromPerson.gender = Gender.FEMALE;
+          fromPerson.setGender(Gender.FEMALE);
         }
         this.setChild(fromPerson, toPerson);
         break;
@@ -66,39 +67,51 @@ export default class ServiceImpl implements Service {
     }
   }
   setCouple(fromPerson: Person, toPerson: Person) {
+    //Couple already exists
     if (fromPerson.coupleId) {
       const fromCouple: Couple = this.getCouple(fromPerson.coupleId);
+      //Finally set person2 in the couple.
+      fromCouple.setPerson2(toPerson);
       if (toPerson.coupleId) {
+        if (fromPerson.coupleId === toPerson.coupleId) return;
+        //If toPerson has a different couple Id, copy children from toPerson to fromPerson
+        //Set fromCouple to toCouple and delete old Couple
         const toCouple: Couple = this.getCouple(toPerson.coupleId);
         fromCouple.copyChildren(toCouple);
-        this.coupleDto.deleteCouple(toPerson.coupleId);
-        toPerson.coupleId = fromPerson.coupleId;
+        this.coupleDto.deleteCouple(toPerson.coupleId); //Delete the old couple
+        toPerson.setCouple(fromPerson.coupleId);
       } else {
-        toPerson.coupleId = fromPerson.coupleId;
+        //This means that there is just one couple
+        //So we can set that couple to the toPerson.
+        toPerson.setCouple(fromPerson.coupleId);
       }
-      fromCouple.setPerson2(toPerson);
     } else {
       if (toPerson.coupleId) {
+        //This means that person2 has a couple already but person1 doesn't.
         const toCouple: Couple = this.getCouple(toPerson.coupleId);
         toCouple.setPerson2(fromPerson);
-        fromPerson.coupleId = toPerson.coupleId;
+        fromPerson.setCouple(toPerson.coupleId);
       } else {
+        //Couple doesn't exist, so create new couple
+        //Set it to two people
         const couple: Couple = new CoupleImpl(fromPerson.name);
         couple.setPerson1(fromPerson);
         couple.setPerson2(toPerson);
         this.addCouple(couple);
-        fromPerson.coupleId = couple.name;
-        toPerson.coupleId = couple.name;
+        fromPerson.setCouple(couple.name);
+        toPerson.setCouple(couple.name);
       }
     }
   }
   setChild(fromPerson: Person, toPerson: Person) {
-    const couple: CoupleImpl = this.getCouple(toPerson.coupleId);
-    if (couple) {
+    if (toPerson.coupleId) {
+      const couple: CoupleImpl = this.getCouple(toPerson.coupleId);
+      //Couple exists so just add the child to that couple.
       addChildToCouple(couple, fromPerson);
     } else {
+      //Couple doesn't exist so create a couple and add the child.
       const newCouple = new CoupleImpl(toPerson.name);
-      toPerson.coupleId = toPerson.name;
+      toPerson.setCouple(toPerson.name);
       newCouple.setPerson1(toPerson);
       this.addCouple(newCouple);
       addChildToCouple(newCouple, fromPerson);
@@ -109,38 +122,44 @@ export default class ServiceImpl implements Service {
   }
   findSons(fromName: String): String[] {
     const fromPerson: Person = this.getPerson(fromName);
-    if (!fromPerson) throw new Error("Person not found");
+    //This means that the person doesn't have a couple yet, so no children.
     if (!fromPerson.coupleId) return [];
     const couple: Couple = this.coupleDto.getCouple(fromPerson.coupleId);
-    if (!couple) throw new Error("Couple not found");
-
     return couple.findSons();
   }
   findDaughters(fromName: String): String[] {
     const fromPerson: Person = this.getPerson(fromName);
-    if (!fromPerson) throw new Error("Person not found");
+    //This means that the person doesn't have a couple yet, so no children.
     if (!fromPerson.coupleId) return [];
     const couple: Couple = this.coupleDto.getCouple(fromPerson.coupleId);
-    if (!couple) throw new Error("Couple not found");
     return couple.findDaughters();
   }
 
   findAllDaughters(fromName: String) {
     const fromPerson: Person = this.getPerson(fromName);
-    if (!fromPerson) throw new Error("Person not found");
+    //This means that the person doesn't have a couple yet, so no children.
     if (!fromPerson.coupleId) return [];
     const couple: Couple = this.coupleDto.getCouple(fromPerson.coupleId);
-    if (!couple) throw new Error("Couple not found");
-    const daughters: String[] = couple.findDaughters();
-    const grandDaughters: String[] = [];
-    daughters.map((daughter) => {
-      grandDaughters.push(...this.findDaughters(daughter));
+    let result: String[] = [];
+    //Find the daughters.
+    result = [...this.findDaughters(fromName)];
+    const children = Array.from(couple.children.values());
+    const grandChildren: Person[] = [];
+    //Find grand daughters.
+    children.map((child) => {
+      if (child.coupleId) {
+        let currentGrandChildren = this.getCouple(child.coupleId).children;
+        grandChildren.push(...Array.from(currentGrandChildren.values()));
+        result.push(...this.findDaughters(child.name));
+      }
     });
-    const greatGrandDaugters: String[] = [];
-    grandDaughters.map((grandDaughter) => {
-      greatGrandDaugters.push(...this.findDaughters(grandDaughter));
+    //Find great grand daughters.
+    grandChildren.map((grandChild) => {
+      if (grandChild.coupleId) {
+        result.push(...this.findDaughters(grandChild.name));
+      }
     });
-    return [...daughters, ...grandDaughters, ...greatGrandDaugters];
+    return result;
   }
 }
 
